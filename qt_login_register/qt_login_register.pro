@@ -23,7 +23,8 @@ HEADERS  += mainwindow.h \
     showinfowindow.h \
     registerwindow.h \
     reguserdb.h \
-    userStruct.h
+    userStruct.h \
+    dbDefine.h
 
 FORMS    += mainwindow.ui \
     showinfowindow.ui \

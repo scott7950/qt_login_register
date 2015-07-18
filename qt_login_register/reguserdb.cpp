@@ -1,16 +1,15 @@
 #include "reguserdb.h"
 #include "userStruct.h"
+#include "dbDefine.h"
 
 RegUserDB::RegUserDB()
 {
-
-    dbName = "db.sqlite";
-
+    dbName = dbPath;
 }
 
 bool RegUserDB::connDB() {
     sdb = QSqlDatabase::addDatabase("QSQLITE");
-    sdb.setDatabaseName("../db/db.sqlite");
+    sdb.setDatabaseName(dbName);
 
     if (!sdb.open()) {
           qDebug() << sdb.lastError().text();
