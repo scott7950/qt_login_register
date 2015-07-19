@@ -15,8 +15,6 @@ RegisterWindow::~RegisterWindow()
 
 void RegisterWindow::on_pbRegister_clicked()
 {
-    hide();
-
     bool isValid = true;
     UserDS user;
 
@@ -45,20 +43,17 @@ void RegisterWindow::on_pbRegister_clicked()
             ui->leAge->setText("");
 
             SessionUser->update(user);
+            hide();
             emit showsw();
         } else {
             QMessageBox msgBox;
             msgBox.setText("[Error] " + user.userDataTypeStr(user.getUserType()));
             msgBox.exec();
-
-            emit show();
         }
     } else {
         QMessageBox msgBox;
         msgBox.setText("Username should be 5~10 characters.\nPassword should be 6~10 characters.\nName should be 1~20 characters.\nAge should be 1~3 digits.");
         msgBox.exec();
-
-        emit show();
     }
 }
 
@@ -66,4 +61,13 @@ void RegisterWindow::on_clbLogin_clicked()
 {
     hide();
     emit showlw();
+}
+
+void RegisterWindow::on_checkBox_toggled(bool checked)
+{
+    if(checked) {
+        ui->lePassword->setEchoMode(QLineEdit::Normal);
+    } else {
+        ui->lePassword->setEchoMode(QLineEdit::Password);
+    }
 }

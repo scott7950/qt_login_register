@@ -28,6 +28,8 @@ private slots:
 
     void on_clbLogin_clicked();
 
+    void on_checkBox_toggled(bool checked);
+
 private:
     Ui::RegisterWindow *ui;
     QSharedPointer<RegUserDB> rudb;

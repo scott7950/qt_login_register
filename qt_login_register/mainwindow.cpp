@@ -16,7 +16,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pbLogin_clicked()
 {
-    hide();
+
 
     QString username = ui->leUsername->text();
     QString password = ui->lePassword->text();
@@ -29,20 +29,17 @@ void MainWindow::on_pbLogin_clicked()
 
             SessionUser->update(user);
 
+            hide();
             emit showsw();
         } else {
             QMessageBox msgBox;
             msgBox.setText("[Error] " + user.userDataTypeStr(user.getUserType()));
             msgBox.exec();
-
-            emit show();
         }
     } else {
         QMessageBox msgBox;
         msgBox.setText("Username should be 5~10 characters.\nPassword should be 6~10 characters.");
         msgBox.exec();
-
-        emit show();
     }
 }
 
