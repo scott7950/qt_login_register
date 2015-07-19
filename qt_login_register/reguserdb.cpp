@@ -1,6 +1,4 @@
 #include "reguserdb.h"
-#include "userStruct.h"
-#include "dbDefine.h"
 
 RegUserDB::RegUserDB()
 {
@@ -20,14 +18,14 @@ bool RegUserDB::connDB() {
     return true;
 }
 
-bool RegUserDB::searchUser(QString username) {
+bool RegUserDB::searchUserByUsername(UserDS& user) {
     bool result;
 
     connDB();
 
     QSqlQuery myQuery;
     myQuery.prepare("SELECT * FROM user WHERE username = ?;");
-    myQuery.addBindValue(username);
+    myQuery.addBindValue(user.getUsername());
 
     if(!myQuery.exec()) {
         qDebug() << "Error in execute query!";
@@ -40,91 +38,56 @@ bool RegUserDB::searchUser(QString username) {
     return result;
 }
 
-int RegUserDB::authUser(QString username, QString password) {
-    int result = 0;
+bool RegUserDB::authUser(UserDS& user) {
+    return searchUserByUsernameAndPassword(user);
+}
 
-    connDB();
+bool RegUserDB::searchUserByUsernameAndPassword(UserDS& user) {
+    bool result = false;
 
-    QSqlQuery myQuery;
-    myQuery.prepare(
-        QString("SELECT * FROM user WHERE username = '%1';")
-                .arg(username)
-    );
+    if(!searchUserByUsername(user)) {
+        result = false;
+    } else {
 
-    if(!myQuery.exec()) {
-        qDebug() << "Error in execute query!";
-    }
+        connDB();
 
-    if(myQuery.last()) {
+        QSqlQuery myQuery;
         myQuery.prepare(
-            QString("SELECT * FROM user WHERE username = '%1' and password = '%2';")
-                    .arg(username).arg(password)
-        );
+                QString("SELECT * FROM user WHERE username = '%1' and password = '%2';")
+                .arg(user.getUsername()).arg(user.getPassword())
+                );
 
         if(!myQuery.exec()) {
-            qDebug() << "Error in execute query!";
-        }
-
-        if(myQuery.last()) {
-            result = 1;
+            user.setUserType(-1);
         } else {
-            result = -1;
-        }
-    } else {
-        result = 0;
-    }
+            int i = 0;
+            while(myQuery.next()) {
+                user.update(myQuery.value(1).toString(), myQuery.value(2).toString(), myQuery.value(3).toString(), myQuery.value(4).toInt());
 
-    myQuery.clear();
-    disconnDB();
+                if(i == 0) {
+                    result = true;
+                    user.setUserType(1);
+                } else {
+                    result = false;
+                    user.setUserType(-2);
+                }
+                i++;
+            }
+        }
+
+        myQuery.clear();
+        disconnDB();
+    }
 
     return result;
-
 }
 
-struct userStruct RegUserDB::searchUserAndReturnResult(QString username, QString password) {
-    struct userStruct user;
+bool RegUserDB::addUser(UserDS& user) {
+    bool result = false;
 
-    user.resultType = 0;
-
-    connDB();
-
-    QSqlQuery myQuery;
-    myQuery.prepare(
-        QString("SELECT * FROM user WHERE username = '%1' and password = '%2';")
-                .arg(username).arg(password)
-    );
-
-    if(!myQuery.exec()) {
-        user.resultType = -1;
-    }
-
-    int i = 0;
-    while(myQuery.next()) {
-        user.username = myQuery.value(1).toString();
-        user.password = myQuery.value(2).toString();
-        user.name = myQuery.value(3).toString();
-        user.age = myQuery.value(4).toInt();
-
-        if(i == 0) {
-            user.resultType = 1;
-        } else {
-            user.resultType = -2;
-        }
-        i++;
-    }
-
-    myQuery.clear();
-    disconnDB();
-
-    return user;
-
-}
-
-int RegUserDB::addUser(QString username, QString password, QString name, int age) {
-    int result = 0;
-
-    if(searchUser(username)) {
-        result = -1;
+    if(searchUserByUsername(user)) {
+        user.setUserType(-1);
+        result = false;
     } else {
 
         connDB();
@@ -132,14 +95,16 @@ int RegUserDB::addUser(QString username, QString password, QString name, int age
         QSqlQuery myQuery;
         myQuery.prepare(
             QString("insert into user (username, password, name, age) values ('%1', '%2', '%3', %4);")
-                    .arg(username).arg(password).arg(name).arg(age)
+                    .arg(user.getUsername()).arg(user.getPassword()).arg(user.getName()).arg(user.getAge())
 
         );
 
         if(myQuery.exec()) {
-            result = 1;
+            user.setUserType(1);
+            result = true;
         } else {
-            result = 0;
+            user.setUserType(-2);
+            result = false;
         }
 
         myQuery.clear();
@@ -156,3 +121,4 @@ void RegUserDB::disconnDB() {
     }
     QSqlDatabase::removeDatabase("QSQLITE");
 }
+

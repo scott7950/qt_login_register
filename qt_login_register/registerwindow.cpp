@@ -1,16 +1,8 @@
 #include "registerwindow.h"
 #include "ui_registerwindow.h"
-#include <QString>
 
-RegisterWindow::RegisterWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::RegisterWindow)
-{
-    ui->setupUi(this);
-}
-
-RegisterWindow::RegisterWindow(RegUserDB& rudb, QWidget *parent) :
-    rudb(rudb), QWidget(parent),
+RegisterWindow::RegisterWindow(QSharedPointer<RegUserDB>& rudb, QSharedPointer<UserDS>& SessionUser, QWidget *parent) :
+    rudb(rudb), SessionUser(SessionUser), QWidget(parent),
     ui(new Ui::RegisterWindow)
 {
 ui->setupUi(this);
@@ -25,46 +17,45 @@ void RegisterWindow::on_pbRegister_clicked()
 {
     hide();
 
+    bool isValid = true;
+    UserDS user;
+
     QString username = ui->leUsername->text();
     QString password = ui->lePassword->text();
     QString name = ui->leName->text();
-    int age = ui->leAge->text().toInt();
+    QString ageStr = ui->leAge->text();
+    int age = -1;
 
-    bool isValid = false;
-    if(username == "") {
+    if((!user.isValidUsernamePattern(username)) || (!user.isValidPasswordPattern(password)) || (!user.isValidNamePattern(name))) {
         isValid = false;
-    } else {
-        isValid = true;
     }
 
-    if(password == "") {
+    if(user.isValidAgePattern(ageStr)) {
+        age = ageStr.toInt();
+    } else {
         isValid = false;
-    } else {
-        isValid = true;
-    }
-
-    if(name == "") {
-        name = "FakeName";
-    }
-
-    if(age == 0) {
-        age = -1;
     }
 
     if(isValid) {
-        if(rudb.addUser(username, password, name, age) == 1) {
-            emit showsw(username, name, age);
+        user.update(username, password, name, age);
+        if(rudb->addUser(user)) {
+            ui->leUsername->setText("");
+            ui->lePassword->setText("");
+            ui->leName->setText("");
+            ui->leAge->setText("");
+
+            SessionUser->update(user);
+            emit showsw();
         } else {
             emit show();
         }
     } else {
         emit show();
     }
-
 }
 
 void RegisterWindow::on_clbLogin_clicked()
 {
-    emit hide();
+    hide();
     emit showlw();
 }

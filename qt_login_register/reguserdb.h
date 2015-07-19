@@ -4,6 +4,9 @@
 #include <QtSql>
 #include <QString>
 
+#include "dbDefine.h"
+#include "userds.h"
+
 class RegUserDB
 {
 public:
@@ -11,10 +14,10 @@ public:
 
     bool connDB();
     void disconnDB();
-    bool searchUser(QString);
-    int addUser(QString, QString, QString, int);
-    int authUser(QString, QString);
-    struct userStruct searchUserAndReturnResult(QString, QString);
+    bool searchUserByUsername(UserDS& user);
+    bool addUser(UserDS& user);
+    bool authUser(UserDS& user);
+    bool searchUserByUsernameAndPassword(UserDS& user);
 
 private:
     QString dbName;

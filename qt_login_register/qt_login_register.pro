@@ -17,14 +17,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     showinfowindow.cpp \
     registerwindow.cpp \
-    reguserdb.cpp
+    reguserdb.cpp \
+    userds.cpp
 
 HEADERS  += mainwindow.h \
     showinfowindow.h \
     registerwindow.h \
     reguserdb.h \
-    userStruct.h \
-    dbDefine.h
+    dbDefine.h \
+    userds.h
 
 FORMS    += mainwindow.ui \
     showinfowindow.ui \

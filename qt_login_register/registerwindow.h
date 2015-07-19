@@ -1,9 +1,10 @@
 #ifndef REGISTERWINDOW_H
 #define REGISTERWINDOW_H
 
-#include "reguserdb.h"
 #include <QWidget>
 #include <QString>
+
+#include "reguserdb.h"
 
 namespace Ui {
 class RegisterWindow;
@@ -14,12 +15,11 @@ class RegisterWindow : public QWidget
     Q_OBJECT
 
 public:
-    explicit RegisterWindow(QWidget *parent = 0);
-    explicit RegisterWindow(RegUserDB&, QWidget *parent = 0);
+    explicit RegisterWindow(QSharedPointer<RegUserDB>&, QSharedPointer<UserDS>&, QWidget *parent = 0);
     ~RegisterWindow();
 
 signals:
-    void showsw(QString&, QString&, int&);
+    void showsw();
     void showlw();
 
 private slots:
@@ -29,7 +29,8 @@ private slots:
 
 private:
     Ui::RegisterWindow *ui;
-    RegUserDB rudb;
+    QSharedPointer<RegUserDB> rudb;
+    QSharedPointer<UserDS> SessionUser;
 };
 
 #endif // REGISTERWINDOW_H
