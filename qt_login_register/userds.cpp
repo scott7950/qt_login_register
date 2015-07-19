@@ -2,10 +2,10 @@
 
 UserDS::UserDS()
 {
-    userType = -1;
+    userType = Invalid;
 }
 
-UserDS::UserDS(int userType) {
+UserDS::UserDS(userDataType userType) {
     this->userType = userType;
 }
 
@@ -20,7 +20,7 @@ UserDS::UserDS(QString username, QString password, QString name, int age) {
     this->age = age;
 }
 
-UserDS::UserDS(QString username, QString password, QString name, int age, int userType) {
+UserDS::UserDS(QString username, QString password, QString name, int age, userDataType userType) {
     this->username = username;
     this->password = password;
     this->name = name;
@@ -28,7 +28,7 @@ UserDS::UserDS(QString username, QString password, QString name, int age, int us
     this->userType = userType;
 }
 
-void UserDS::setUserType(int userType) {
+void UserDS::setUserType(userDataType userType) {
     this->userType = userType;
 }
 
@@ -48,7 +48,7 @@ void UserDS::setAge(int age) {
     this->age = age;
 }
 
-int UserDS::getUserType() {
+UserDS::userDataType UserDS::getUserType() {
     return userType;
 }
 
@@ -83,7 +83,7 @@ void UserDS::update(QString username, QString password, QString name, int age) {
     this->age = age;
 }
 
-void UserDS::update(QString username, QString password, QString name, int age, int userType) {
+void UserDS::update(QString username, QString password, QString name, int age, userDataType userType) {
     this->username = username;
     this->password = password;
     this->name = name;
@@ -92,7 +92,7 @@ void UserDS::update(QString username, QString password, QString name, int age, i
 }
 
 void UserDS::clear() {
-    update("", "", "", -1, -1);
+    update("", "", "", -1, Invalid);
 }
 
 bool UserDS::isValidUsernamePattern() {
@@ -178,3 +178,32 @@ bool UserDS::isValidAgePattern(QString age) {
         }
     }
 }
+
+QString UserDS::userDataTypeStr(userDataType userType) {
+    switch(userType) {
+        case Invalid:
+            return "Invalid";
+            break;
+        case Valid:
+            return "Valid";
+            break;
+        case ErrOpenDB:
+            return "ErrOpenDB";
+            break;
+        case ErrSqlExec:
+            return "ErrSqlExec";
+            break;
+        case ErrNoData:
+            return "ErrNoData";
+            break;
+        case ErrMultiData:
+            return "ErrMultiData";
+            break;
+        case ErrExistData:
+            return "ErrExistData";
+            break;
+        default:
+            return "Unknown";
+    }
+}
+

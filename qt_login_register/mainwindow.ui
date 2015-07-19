@@ -40,7 +40,7 @@
      <string>Register</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>40</x>
@@ -70,7 +70,10 @@
      <item>
       <widget class="QLineEdit" name="lePassword">
        <property name="inputMethodHints">
-        <set>Qt::ImhHiddenText</set>
+        <set>Qt::ImhHiddenText|Qt::ImhNoAutoUppercase|Qt::ImhNoPredictiveText|Qt::ImhSensitiveData</set>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
        </property>
       </widget>
      </item>

@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QDebug>
 #include <QString>
+#include <QMessageBox>
 
 #include "showinfowindow.h"
 #include "reguserdb.h"
@@ -29,7 +29,7 @@ private slots:
     void on_pbLogin_clicked();
 
     void on_clbRegister_clicked();
-    void on_showrw() {emit showrw(); qDebug() << "hello";}
+    void on_showrw() {emit showrw();}
 
 private:
     Ui::MainWindow *ui;

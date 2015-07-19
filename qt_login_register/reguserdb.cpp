@@ -6,32 +6,43 @@ RegUserDB::RegUserDB()
 }
 
 bool RegUserDB::connDB() {
-    sdb = QSqlDatabase::addDatabase("QSQLITE");
-    sdb.setDatabaseName(dbName);
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName(dbName);
 
-    if (!sdb.open()) {
-          qDebug() << sdb.lastError().text();
-          return false;
+    if (!db.open()) {
+        QSqlDatabase::removeDatabase("QSQLITE");
+
+        QMessageBox msgBox;
+        msgBox.setText(db.lastError().text());
+        msgBox.exec();
+
+        return false;
     }
-
 
     return true;
 }
 
 bool RegUserDB::searchUserByUsername(UserDS& user) {
-    bool result;
+    bool result = false;
 
-    connDB();
+    if(!connDB()) {
+        user.setUserType(UserDS::ErrOpenDB);
+        return false;
+    }
 
     QSqlQuery myQuery;
     myQuery.prepare("SELECT * FROM user WHERE username = ?;");
     myQuery.addBindValue(user.getUsername());
 
     if(!myQuery.exec()) {
-        qDebug() << "Error in execute query!";
+        user.setUserType(UserDS::ErrSqlExec);
+    } else {
+        result = myQuery.last();
+        if(!result) {
+            user.setUserType(UserDS::ErrNoData);
+        }
     }
 
-    result = myQuery.last();
     myQuery.clear();
     disconnDB();
 
@@ -49,7 +60,10 @@ bool RegUserDB::searchUserByUsernameAndPassword(UserDS& user) {
         result = false;
     } else {
 
-        connDB();
+        if(!connDB()) {
+            user.setUserType(UserDS::ErrOpenDB);
+            return false;
+        }
 
         QSqlQuery myQuery;
         myQuery.prepare(
@@ -58,20 +72,25 @@ bool RegUserDB::searchUserByUsernameAndPassword(UserDS& user) {
                 );
 
         if(!myQuery.exec()) {
-            user.setUserType(-1);
+            user.setUserType(UserDS::ErrSqlExec);
         } else {
             int i = 0;
+
             while(myQuery.next()) {
                 user.update(myQuery.value(1).toString(), myQuery.value(2).toString(), myQuery.value(3).toString(), myQuery.value(4).toInt());
 
                 if(i == 0) {
                     result = true;
-                    user.setUserType(1);
+                    user.setUserType(UserDS::Valid);
                 } else {
                     result = false;
-                    user.setUserType(-2);
+                    user.setUserType(UserDS::ErrMultiData);
                 }
                 i++;
+            }
+
+            if(i==0) {
+                user.setUserType(UserDS::ErrNoData);
             }
         }
 
@@ -86,11 +105,14 @@ bool RegUserDB::addUser(UserDS& user) {
     bool result = false;
 
     if(searchUserByUsername(user)) {
-        user.setUserType(-1);
+        user.setUserType(UserDS::ErrExistData);
         result = false;
     } else {
 
-        connDB();
+        if(!connDB()) {
+            user.setUserType(UserDS::ErrOpenDB);
+            return false;
+        }
 
         QSqlQuery myQuery;
         myQuery.prepare(
@@ -100,10 +122,10 @@ bool RegUserDB::addUser(UserDS& user) {
         );
 
         if(myQuery.exec()) {
-            user.setUserType(1);
+            user.setUserType(UserDS::Valid);
             result = true;
         } else {
-            user.setUserType(-2);
+            user.setUserType(UserDS::ErrSqlExec);
             result = false;
         }
 
@@ -116,9 +138,8 @@ bool RegUserDB::addUser(UserDS& user) {
 }
 
 void RegUserDB::disconnDB() {
-    if(sdb.isOpen()) {
-        sdb.close();
+    if(db.isOpen()) {
+        db.close();
     }
     QSqlDatabase::removeDatabase("QSQLITE");
 }
-

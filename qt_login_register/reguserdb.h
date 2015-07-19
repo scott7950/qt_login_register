@@ -3,6 +3,7 @@
 
 #include <QtSql>
 #include <QString>
+#include <QMessageBox>
 
 #include "dbDefine.h"
 #include "userds.h"
@@ -21,7 +22,7 @@ public:
 
 private:
     QString dbName;
-    QSqlDatabase sdb;
+    QSqlDatabase db;
 };
 
 #endif // REGUSERDB_H

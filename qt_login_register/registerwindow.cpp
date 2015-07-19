@@ -47,9 +47,17 @@ void RegisterWindow::on_pbRegister_clicked()
             SessionUser->update(user);
             emit showsw();
         } else {
+            QMessageBox msgBox;
+            msgBox.setText("[Error] " + user.userDataTypeStr(user.getUserType()));
+            msgBox.exec();
+
             emit show();
         }
     } else {
+        QMessageBox msgBox;
+        msgBox.setText("Username should be 5~10 characters.\nPassword should be 6~10 characters.\nName should be 1~20 characters.\nAge should be 1~3 digits.");
+        msgBox.exec();
+
         emit show();
     }
 }

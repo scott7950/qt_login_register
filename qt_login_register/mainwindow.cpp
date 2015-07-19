@@ -6,7 +6,7 @@ MainWindow::MainWindow(QSharedPointer<RegUserDB>& rudb, QSharedPointer<UserDS>& 
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    //ui->lePassword->setEchoMode(QLineEdit::Password);
 }
 
 MainWindow::~MainWindow()
@@ -31,9 +31,17 @@ void MainWindow::on_pbLogin_clicked()
 
             emit showsw();
         } else {
+            QMessageBox msgBox;
+            msgBox.setText("[Error] " + user.userDataTypeStr(user.getUserType()));
+            msgBox.exec();
+
             emit show();
         }
     } else {
+        QMessageBox msgBox;
+        msgBox.setText("Username should be 5~10 characters.\nPassword should be 6~10 characters.");
+        msgBox.exec();
+
         emit show();
     }
 }

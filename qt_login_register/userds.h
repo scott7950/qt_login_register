@@ -3,23 +3,34 @@
 
 #include <QString>
 #include <QRegularExpression>
+#include <QMetaEnum>
 
 class UserDS
 {
 public:
+    enum userDataType {
+        Invalid,
+        Valid,
+        ErrOpenDB,
+        ErrSqlExec,
+        ErrNoData,
+        ErrMultiData,
+        ErrExistData
+    };
+
     UserDS();
-    UserDS(int userType);
+    UserDS(userDataType userType);
     UserDS(QString username, QString password);
     UserDS(QString username, QString password, QString name, int age);
-    UserDS(QString username, QString password, QString name, int age, int userType);
+    UserDS(QString username, QString password, QString name, int age, userDataType userType);
 
-    void setUserType(int userType);
+    void setUserType(userDataType userType);
     void setUsername(QString username);
     void setPassword(QString password);
     void setName(QString name);
     void setAge(int age);
 
-    int getUserType();
+    userDataType getUserType();
     QString getUsername();
     QString getPassword();
     QString getName();
@@ -27,7 +38,7 @@ public:
 
     void update(UserDS user);
     void update(QString username, QString password, QString name, int age);
-    void update(QString username, QString password, QString name, int age, int userType);
+    void update(QString username, QString password, QString name, int age, userDataType userType);
 
     void clear();
 
@@ -40,8 +51,10 @@ public:
     bool isValidNamePattern(QString name);
     bool isValidAgePattern(QString age);
 
+    QString userDataTypeStr(userDataType);
+
 private:
-    int userType;
+    userDataType userType;
     QString username;
     QString password;
     QString name;
